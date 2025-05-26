@@ -29,7 +29,9 @@ def get_request(endpoint, **kwargs):
         print("Network exception occurred")
 
 def analyze_review_sentiments(text):
-    request_url = sentiment_analyzer_url+"analyze/"+text
+    print("Loaded sentiment_analyzer_url:", sentiment_analyzer_url)
+
+    request_url = "https://sentianalyzer.1vwi2rqbh9ql.us-south.codeengine.appdomain.cloud/analyze/" + text
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
@@ -37,6 +39,7 @@ def analyze_review_sentiments(text):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         print("Network exception occurred")
+
 
 def post_review(data_dict):
     request_url = backend_url+"/insert_review"
