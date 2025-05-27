@@ -1,4 +1,3 @@
-from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.csrf import csrf_exempt
@@ -132,7 +131,8 @@ def get_dealer_reviews(request, dealer_id):
         return JsonResponse({
             "status": 500,
             "message": (
-                f"An error occurred grabbing reviews for dealer {dealer_id}: {err}"
+                f"An error occurred grabbing reviews for dealer "
+                f"{dealer_id}: {err}"
             ),
             "reviews": []
         })
