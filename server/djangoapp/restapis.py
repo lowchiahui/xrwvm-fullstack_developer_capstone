@@ -31,10 +31,10 @@ def get_request(endpoint, **kwargs):
 def analyze_review_sentiments(text):
     print("Loaded sentiment_analyzer_url:", sentiment_analyzer_url)
 
-    request_url = "https://sentianalyzer.1vwi2rqbh9ql.us-south.codeengine.appdomain.cloud/analyze/" + text
+    request_url = "https://sentianalyzer.1vx8o30kmvt9.us-south.codeengine.appdomain.cloud//analyze/" + text
     try:
         # Call get method of requests library with URL and parameters
-        response = requests.get(request_url)
+        response = requests.get(request_url, verify=True)
         return response.json()
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")

@@ -104,33 +104,60 @@ def get_dealerships(request, state="All"):
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 def get_dealer_reviews(request, dealer_id):
     try:
-        # if dealer id has been provided
         if dealer_id:
             endpoint = "/fetchReviews/dealer/" + str(dealer_id)
             reviews = get_request(endpoint)
-            if reviews : 
-                for review_detail in reviews:
-                    print(review_detail)
-                    response = analyze_review_sentiments(review_detail["review"])  # noaqa: E501
-                    print(response)
-                    review_detail["sentiment"] = response["sentiment"]
+
+            # Make sure reviews is always a list
+            if reviews is None:
+                reviews = []
+
+            # Add sentiment to each review
+            for review_detail in reviews:
+                response = analyze_review_sentiments(review_detail.get("review", ""))
+                print("Sentiment analysis response:", response)
+
+                sentiment = "neutral"  # default fallback
+
+                if response and isinstance(response, dict):
+                    # Try to get 'sentiment' key
+                    sentiment = response.get("sentiment")
+
+                    # If not found, try other possible keys
+                    if not sentiment and "label" in response:
+                        sentiment = response.get("label")
+
+                    # If still no sentiment, fallback to string representation of response
+                    if not sentiment:
+                        sentiment = str(response)
+
+                elif response:
+                    # If response is not dict, convert to string just in case
+                    sentiment = str(response)
+
+                review_detail["sentiment"] = sentiment
+
             return JsonResponse({"status": 200, "reviews": reviews})
+
         else:
-            return JsonResponse({"status": 400, "message": "Bad Request"})
+            return JsonResponse({"status": 400, "message": "Bad Request: dealer_id missing"})
     except Exception as err:
-        print(err)
-        return JsonResponse({"status": 500, "message": f"Am Error occured grabing reviews for {dealer_id} , the error :  {err}"})
+        print(f"Error getting reviews for dealer {dealer_id}: {err}")
+        return JsonResponse({
+            "status": 500,
+            "message": f"An error occurred grabbing reviews for dealer {dealer_id}: {err}",
+            "reviews": []  # keep consistent response shape
+        })
+
+
 
 
 # Create a `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
-    # if dealer id has been provided
- 
     if dealer_id:
         endpoint = "/fetchDealer/" + str(dealer_id)
         dealer = get_request(endpoint)
-
-        return JsonResponse({"status": 200, "dealer": dealer})
+        return JsonResponse({"status": 200, "dealer": [dealer]})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
